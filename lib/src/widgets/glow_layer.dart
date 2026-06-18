@@ -1,32 +1,24 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import '../enums/led_mode.dart';
 
 class GlowLayer extends StatelessWidget {
   final double animationValue;
   final double radius;
   final BorderRadius borderRadius;
+  final Color color;
+  final LedMode mode;
 
   const GlowLayer({
     super.key,
     required this.animationValue,
     required this.radius,
     required this.borderRadius,
+    required this.color,
+    required this.mode,
   });
-
-  Color _color(double t) {
-    return HSVColor.fromAHSV(
-      1,
-      t * 360,
-      1,
-      1,
-    ).toColor();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final color = _color(animationValue);
-
     return Positioned.fill(
       child: IgnorePointer(
         child: Container(
@@ -34,14 +26,26 @@ class GlowLayer extends StatelessWidget {
             borderRadius: borderRadius,
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(.6),
+                color: _getEffectiveColor().withOpacity(0.6),
                 blurRadius: radius,
-                spreadRadius: radius * .15,
+                spreadRadius: radius * 0.15,
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Color _getEffectiveColor() {
+    if (mode == LedMode.staticColor) return color;
+    
+    // Default dynamic behavior (Rainbow)
+    return HSVColor.fromAHSV(
+      1.0,
+      animationValue * 360,
+      1.0,
+      1.0,
+    ).toColor();
   }
 }

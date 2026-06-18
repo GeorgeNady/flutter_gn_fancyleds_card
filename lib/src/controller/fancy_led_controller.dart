@@ -11,4 +11,8 @@ class FancyLedController extends ChangeNotifier {
     color = value;
     notifyListeners();
   }
+
+  void refresh() {
+    notifyListeners();
+  }
 }
