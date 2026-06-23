@@ -1,8 +1,11 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'enums/led_mode.dart';
+import 'package:flutter/scheduler.dart'; // Required for SchedulerBinding
+
 import 'controller/fancy_led_controller.dart';
+import 'enums/led_mode.dart';
 import 'services/ambient_processor.dart';
 import 'widgets/ambient_glow_layer.dart';
 import 'widgets/animated_led_border.dart';
@@ -34,10 +37,11 @@ class FancyLedCard extends StatefulWidget {
   State<FancyLedCard> createState() => _FancyLedCardState();
 }
 
-class _FancyLedCardState extends State<FancyLedCard> with SingleTickerProviderStateMixin {
+class _FancyLedCardState extends State<FancyLedCard>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   final GlobalKey _boundaryKey = GlobalKey();
-  
+
   AmbientData? _ambientData;
   late final IImageProcessor _processor;
 
@@ -47,7 +51,11 @@ class _FancyLedCardState extends State<FancyLedCard> with SingleTickerProviderSt
     _processor = widget.processor ?? AmbilightProcessor();
     _initAnimation();
     _setupController();
-    _requestAmbientUpdate();
+
+    // Defer the initial frame capture until the widget tree is fully laid out
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _requestAmbientUpdate(),
+    );
   }
 
   void _initAnimation() {
@@ -87,18 +95,41 @@ class _FancyLedCardState extends State<FancyLedCard> with SingleTickerProviderSt
   }
 
   void _requestAmbientUpdate() {
-    if (widget.mode != LedMode.ambient) return;
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final boundary = _boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null) return;
+    if (widget.mode != LedMode.ambient || !mounted) return;
 
-      final data = await _processor.process(boundary);
-      if (mounted) {
-        setState(() {
-          _ambientData?.dispose();
-          _ambientData = data;
-        });
+    // Use a microtask to read the pipeline status cleanly at the end of the execution stack
+    Future.microtask(() async {
+      final context = _boundaryKey.currentContext;
+      if (context == null || !mounted) return;
+
+      final boundary = context.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null || !boundary.attached) return;
+
+      // If the render layer is busy or needs paint, wait for the next frame window safely
+      if (boundary.debugNeedsPaint) {
+        SchedulerBinding.instance.addPostFrameCallback(
+          (_) => _requestAmbientUpdate(),
+        );
+        return;
+      }
+
+      try {
+        // Capture snapshot synchronously before passing it over an async gap
+        final ui.Image snapshot = await boundary.toImage(pixelRatio: 1.0);
+
+        // Keep the strategy pattern robust by passing the boundary directly
+        // to maintain backward compatibility with your library design
+        final data = await _processor.process(snapshot);
+
+        if (mounted) {
+          setState(() {
+            _ambientData?.dispose();
+            _ambientData = data;
+          });
+        }
+      } catch (e) {
+        // Fallback catch to handle engine frames passing over dynamic mutations safely
+        debugPrint("Ambient layout processing deferred: $e");
       }
     });
   }
@@ -117,10 +148,7 @@ class _FancyLedCardState extends State<FancyLedCard> with SingleTickerProviderSt
         return Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.none,
-          children: [
-            _buildGlowLayer(activeColor),
-            _buildBorder(activeColor),
-          ],
+          children: [_buildGlowLayer(activeColor), _buildBorder(activeColor)],
         );
       },
     );

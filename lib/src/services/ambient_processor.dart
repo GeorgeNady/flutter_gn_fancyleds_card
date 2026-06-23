@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 
 /// Interface for image processing strategies (Dependency Inversion Principle).
 abstract class IImageProcessor {
-  Future<AmbientData> process(RenderRepaintBoundary boundary);
+  Future<AmbientData> process(ui.Image image);
 }
 
 /// Data class holding processed ambient information.
@@ -21,8 +21,7 @@ class AmbientData {
 /// Implementation of Ambilight-style processing (Single Responsibility Principle).
 class AmbilightProcessor implements IImageProcessor {
   @override
-  Future<AmbientData> process(RenderRepaintBoundary boundary) async {
-    final image = await boundary.toImage(pixelRatio: 1.0);
+  Future<AmbientData> process(ui.Image image) async {
     final sampledColors = await _extractPerimeterColors(image);
     return AmbientData(image: image, sampledColors: sampledColors);
   }
