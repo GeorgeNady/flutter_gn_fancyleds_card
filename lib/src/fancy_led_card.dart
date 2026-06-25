@@ -5,15 +5,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart'; // Required for SchedulerBinding
 
 import 'controller/fancy_led_controller.dart';
-import 'enums/led_mode.dart';
 import 'services/ambient_processor.dart';
 import 'widgets/ambient_glow_layer.dart';
 import 'widgets/animated_led_border.dart';
-import 'widgets/glow_layer.dart';
 
 class FancyLedCard extends StatefulWidget {
   final Widget child;
-  final LedMode mode;
   final double borderWidth;
   final double glowRadius;
   final BorderRadius borderRadius;
@@ -24,7 +21,6 @@ class FancyLedCard extends StatefulWidget {
   const FancyLedCard({
     super.key,
     required this.child,
-    this.mode = LedMode.rainbow,
     this.borderWidth = 2,
     this.glowRadius = 40,
     this.borderRadius = const BorderRadius.all(Radius.circular(24)),
@@ -77,25 +73,21 @@ class _FancyLedCardState extends State<FancyLedCard>
       widget.controller?.addListener(_onControllerChanged);
     }
 
-    if (widget.mode == LedMode.ambient && _shouldUpdateAmbient(oldWidget)) {
+    if (_shouldUpdateAmbient(oldWidget)) {
       _requestAmbientUpdate();
     }
   }
 
   bool _shouldUpdateAmbient(FancyLedCard oldWidget) {
-    return oldWidget.child != widget.child || oldWidget.mode != widget.mode;
+    return oldWidget.child != widget.child;
   }
 
   void _onControllerChanged() {
-    if (widget.mode == LedMode.ambient) {
-      _requestAmbientUpdate();
-    } else {
-      setState(() {});
-    }
+    _requestAmbientUpdate();
   }
 
   void _requestAmbientUpdate() {
-    if (widget.mode != LedMode.ambient || !mounted) return;
+    if (!mounted) return;
 
     // Use a microtask to read the pipeline status cleanly at the end of the execution stack
     Future.microtask(() async {
@@ -148,26 +140,17 @@ class _FancyLedCardState extends State<FancyLedCard>
         return Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.none,
-          children: [_buildGlowLayer(activeColor), _buildBorder(activeColor)],
+          children: [_buildGlowLayer(), _buildBorder(activeColor)],
         );
       },
     );
   }
 
-  Widget _buildGlowLayer(Color color) {
-    if (widget.mode == LedMode.ambient) {
-      return AmbientGlowLayer(
-        image: _ambientData?.image,
-        radius: widget.glowRadius,
-        borderRadius: widget.borderRadius,
-      );
-    }
-    return GlowLayer(
-      animationValue: _animationController.value,
+  Widget _buildGlowLayer() {
+    return AmbientGlowLayer(
+      image: _ambientData?.image,
       radius: widget.glowRadius,
       borderRadius: widget.borderRadius,
-      color: color,
-      mode: widget.mode,
     );
   }
 
@@ -178,7 +161,6 @@ class _FancyLedCardState extends State<FancyLedCard>
       borderRadius: widget.borderRadius,
       boundaryKey: _boundaryKey,
       color: color,
-      mode: widget.mode,
       sampledColors: _ambientData?.sampledColors ?? [],
       child: widget.child,
     );

@@ -7,12 +7,11 @@ A customizable card widget featuring an animated LED border and a vibrant backgr
 
 ## Features
 
-- **Animated LED Border**: A beautiful sweeping gradient border that rotates smoothly around the child widget.
-- **Vibrant Glow Effect**: A soft background glow that shifts dynamically along with the border color.
-- **Ambilight (Ambient) Mode**: A content-aware mode that extracts colors from your child widget's edges to create a perfectly matching ambient glow and border.
+- **Ambilight (Ambient) Effect**: A content-aware mode that extracts colors from your child widget's edges to create a perfectly matching ambient glow and border.
+- **Animated LED Border**: A beautiful sweeping gradient border that rotates smoothly based on the sampled colors.
+- **Vibrant Glow Effect**: A soft background glow that shifts dynamically along with the border colors.
 - **SOLID Architecture**: Built with clean code principles, allowing for custom image processors and easy extensibility.
-- **Highly Customizable**: Easily adjust border width, glow radius, border radius, and animation modes.
-- **Multiple LED Modes**: `staticColor`, `breathing`, `rainbow`, `rainbowWave`, `pulse`, `chase`, and `ambient`.
+- **Highly Customizable**: Easily adjust border width, glow radius, and border radius.
 
 ## Getting started
 
@@ -32,44 +31,19 @@ dependencies:
 
 ```dart
 FancyLedCard(
+  glowRadius: 50,
   child: Container(
     width: 300,
     height: 150,
     alignment: Alignment.center,
-    child: const Text(
-      'Hello LED!',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    decoration: BoxDecoration(
+      color: Colors.blue.shade900,
+      borderRadius: BorderRadius.circular(24),
     ),
-  ),
-)
-```
-
-### Ambilight (Ambient) Mode
-
-This mode samples pixels from the child widget to create a immersive lighting effect.
-
-```dart
-FancyLedCard(
-  mode: LedMode.ambient,
-  glowRadius: 50,
-  child: Image.network('https://example.com/movie_poster.jpg'),
-)
-```
-
-### Custom Configuration with Controller
-
-```dart
-final controller = FancyLedController(color: Colors.orange);
-
-FancyLedCard(
-  controller: controller,
-  mode: LedMode.staticColor,
-  borderWidth: 4.0,
-  glowRadius: 50.0,
-  borderRadius: BorderRadius.circular(16),
-  child: const Padding(
-    padding: EdgeInsets.all(24.0),
-    child: Icon(Icons.bolt, size: 48, color: Colors.amber),
+    child: const Text(
+      'Hello Ambient LED!',
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+    ),
   ),
 )
 ```
@@ -81,12 +55,11 @@ FancyLedCard(
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `child` | `Widget` | **Required** | The widget to display inside the fancy card. |
-| `mode` | `LedMode` | `LedMode.rainbow` | The operational mode for the LED animation effects. |
 | `borderWidth` | `double` | `2.0` | The width of the sweeping animated border. |
 | `glowRadius` | `double` | `40.0` | The blur radius and spread extent of the color glow layer. |
 | `borderRadius` | `BorderRadius` | `BorderRadius.circular(24)` | The clip and decoration border radius for the card. |
 | `controller` | `FancyLedController?` | `null` | Controller for external control and manual refreshes. |
-| `color` | `Color?` | `null` | Static color for `staticColor` mode (overrides controller). |
+| `color` | `Color?` | `null` | Primary color used if ambient data is not yet available. |
 | `processor` | `IImageProcessor?` | `AmbilightProcessor()` | Custom strategy for ambient pixel sampling. |
 
 ## License

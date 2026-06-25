@@ -1,3 +1,10 @@
+## 2.0.0
+
+* **Breaking Change**: Removed `LedMode` enum and unified the library to focus exclusively on the **Ambient (Ambilight)** effect.
+* **Simplification**: Removed `GlowLayer` (static/rainbow) in favor of the more advanced `AmbientGlowLayer`.
+* **Refactor**: Simplified `FancyLedCard` API by removing the `mode` parameter.
+* **Enhancement**: Optimized the sweeping border animation to work seamlessly with sampled ambient colors.
+
 ## 1.1.0
 
 * **Feature**: Added `LedMode.ambient` (Ambilight-style effect).

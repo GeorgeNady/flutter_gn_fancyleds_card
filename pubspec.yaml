@@ -1,6 +1,6 @@
 name: flutter_gn_fancyleds_card
 description: "A customizable Flutter card widget with an animated LED border and vibrant glow effects."
-version: 1.1.0
+version: 2.0.0
 homepage:
 
 environment:
@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  image: ^4.2.0
 
 dev_dependencies:
   flutter_test:

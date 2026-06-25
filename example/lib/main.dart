@@ -32,8 +32,6 @@ class ExampleHome extends StatefulWidget {
 }
 
 class _ExampleHomeState extends State<ExampleHome> {
-  LedMode _currentMode = LedMode.rainbow;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +47,6 @@ class _ExampleHomeState extends State<ExampleHome> {
             children: [
               // The Fancy Card
               FancyLedCard(
-                mode: _currentMode,
                 glowRadius: 50,
                 borderWidth: 2,
                 child: Container(
@@ -92,43 +89,14 @@ class _ExampleHomeState extends State<ExampleHome> {
               ),
               const SizedBox(height: 60),
 
-              // Mode Selector
-              const Text(
-                'Select LED Mode:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: LedMode.values.map((mode) {
-                  return ChoiceChip(
-                    label: Text(mode.name),
-                    selected: _currentMode == mode,
-                    onSelected: (selected) {
-                      if (selected) {
-                        setState(() {
-                          _currentMode = mode;
-                        });
-                      }
-                    },
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 40),
-              
-              // Ambient Example
-              if (_currentMode == LedMode.ambient)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'In Ambient mode, the glow matches the colors of the child widget. Try adding colorful elements!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'The glow matches the colors of the child widget dynamically!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
                 ),
+              ),
             ],
           ),
         ),
