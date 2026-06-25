@@ -13,6 +13,7 @@ class FancyLedCard extends StatefulWidget {
   final Widget child;
   final double borderWidth;
   final double glowRadius;
+  final Duration glowDuration;
   final BorderRadius borderRadius;
   final FancyLedController? controller;
   final Color? color;
@@ -23,6 +24,7 @@ class FancyLedCard extends StatefulWidget {
     required this.child,
     this.borderWidth = 2,
     this.glowRadius = 40,
+    this.glowDuration = const Duration(milliseconds: 150),
     this.borderRadius = const BorderRadius.all(Radius.circular(24)),
     this.controller,
     this.color,
@@ -147,10 +149,17 @@ class _FancyLedCardState extends State<FancyLedCard>
   }
 
   Widget _buildGlowLayer() {
-    return AmbientGlowLayer(
-      image: _ambientData?.image,
-      radius: widget.glowRadius,
-      borderRadius: widget.borderRadius,
+    return TweenAnimationBuilder<double>(
+      duration: widget.glowDuration,
+      tween: Tween<double>(begin: 0, end: widget.glowRadius),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return AmbientGlowLayer(
+          image: _ambientData?.image,
+          radius: value,
+          borderRadius: widget.borderRadius,
+        );
+      },
     );
   }
 

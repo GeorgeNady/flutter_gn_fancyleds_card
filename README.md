@@ -57,6 +57,7 @@ FancyLedCard(
 | `child` | `Widget` | **Required** | The widget to display inside the fancy card. |
 | `borderWidth` | `double` | `2.0` | The width of the sweeping animated border. |
 | `glowRadius` | `double` | `40.0` | The blur radius and spread extent of the color glow layer. |
+| `glowDuration` | `Duration` | `150ms` | The duration for the glow radius animation (from 0 to target). |
 | `borderRadius` | `BorderRadius` | `BorderRadius.circular(24)` | The clip and decoration border radius for the card. |
 | `controller` | `FancyLedController?` | `null` | Controller for external control and manual refreshes. |
 | `color` | `Color?` | `null` | Primary color used if ambient data is not yet available. |

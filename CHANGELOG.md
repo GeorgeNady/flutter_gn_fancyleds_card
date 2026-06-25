@@ -1,3 +1,8 @@
+## 2.1.0
+
+* **Feature**: Added animated glow radius. The glow now smoothly expands from 0 to the target radius.
+* **Enhancement**: Added `glowDuration` parameter to `FancyLedCard` to allow custom control over the glow animation speed (defaults to 150ms).
+
 ## 2.0.0
 
 * **Breaking Change**: Removed `LedMode` enum and unified the library to focus exclusively on the **Ambient (Ambilight)** effect.
